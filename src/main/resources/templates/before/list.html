@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍主界面</title>
+
+    <script src="../js/jquery.min.js"></script>
+</head>
+<style>
+    .div1{
+        border:1px solid #000;
+        width: 456px;
+    }
+    .div2{
+        float: left;
+        border:1px solid #000;
+        width: 150px;
+        align-items: center;
+        height: 80%;
+    }
+    .div3{
+        height:20%
+    }
+    .div3-1{
+        float: left;
+        width: 10%;
+    }
+    .div3-2{
+        float: left;
+        width: 20%;
+    }
+    .div3-3{
+        float: left;
+        width: 40%;
+        align-items: center;
+    }
+    .span1{
+        font-size:25px;
+        fount-weight:bold
+    }
+</style>
+<body>
+<center>
+        <br><br>
+        <span class="span1" >欢迎<span th:text="${session.customer.name}"></span>光临本书店</span><br><br>
+        <a href="../customer/logout">退出登录</a><br>
+        <h4>图书列表</h4>
+        <a href="../customer/toList?classid=0&page=1"><h4>浏览所有图书</h4></a>
+
+        <div  style="width:456px;display:inline">
+            <span th:each="class : ${classes}">
+                <a float="left"
+               th:href="@{../customer/toList(classid=${class.id},page=1)}"
+               th:text="${class.name}"></a><span>&nbsp</span>
+            </span>
+
+            <a float="left" th:href="@{../shopper/toShopping(cid=${session.customer.id})}">查看购物车</a>
+        </div>
+
+        <div class="div1">
+            <div class="div2" th:each="book : ${myPage.data}">
+                <img th:src="@{'http://localhost:8081/book/'+${book.path}}" alt="书籍封面"><br>
+                书名：<span th:text="${book.bookname}"></span><br>
+                作者名：<span th:text="${book.author}"></span><br>
+                价格：<span th:text="${book.price}"></span><br>
+                <a href="javascript:void(0)" th:onclick="addShopping([[${book.id}]])">加入购物车</a>
+            </div>
+           <div class="div3">
+                <div class="div3-1">
+                    <a th:href="@{../customer/toList(classid=${classid},page=1)}">首页</a>
+                </div>
+                <div class="div3-2">
+                    <a th:if="${myPage.page} == 1" disabled="true" >上一页</a>
+                    <a th:if="${myPage.page} != 1" th:href="@{../customer/toList(classid=${classid},page=${myPage.page}-1)}">上一页</a>
+                </div>
+                <div class="div3-3">
+                    当前页：<span th:text="${myPage.page}"></span>/<span th:text="${myPage.size}"></span>
+                </div>
+                <div class="div3-2">
+                    <a th:if="${myPage.page} == ${myPage.size}" disabled="true" >下一页</a>
+                    <a th:if="${myPage.page} != ${myPage.size}"  th:href="@{../customer/toList(classid=${classid},page=${myPage.page}+1)}">下一页</a>
+                </div>
+                <div class="div3-1">
+                    <a th:href="@{../customer/toList(classid=${classid},page=${myPage.size})}">末页</a>
+                </div>
+            </div>
+
+        </div>
+
+</center>
+</body>
+<script>
+    function addShopping(id) {
+        if(confirm("是否确定添加本书到购物车?")){
+
+            $.post(
+                "../shopper/addShopper",
+                {"bid":id},
+                function (data) {
+                    if(data == "success"){
+                        alert("添加成功!");
+                    }
+                }
+            )
+
+        }
+
+    }
+
+</script>
+</html>

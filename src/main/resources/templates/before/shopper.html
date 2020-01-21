@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车主界面</title>
+
+    <script src="../js/jquery.min.js"></script>
+</head>
+<style>
+    .div1{
+        width: 800px;
+    }
+
+    .span1{
+        font-size:25px;
+        fount-weight:bold
+    }
+    .tr0{
+        width: 5%;
+    }
+    .tr1{
+        width: 10%;
+    }
+    .tr2{
+        width: 20%;
+    }
+    .tr3{
+        width: 15%;
+    }
+    .tr4{
+        width: 100%;
+    }
+
+</style>
+<body>
+<center>
+        <br><br>
+        <span class="span1" ><span th:text="${session.customer.name}"></span>的购物车</span><br>
+        <h4>您购买的商品如下</h4>
+
+        <a  th:href="@{../customer/toList}">返回继续浏览</a>
+
+        <div class="div1">
+            <table align="center" border="1" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th class="tr0">序号</th>
+                    <th class="tr2">封面</th>
+                    <th class="tr3">书名</th>
+                    <th class="tr3">作者</th>
+                    <th class="tr3">单价</th>
+                    <th class="tr1">数量</th>
+                    <th class="tr2">操作</th>
+                </tr>
+                <tr align="center" border="1" th:each="shopper,state : ${myShopper.data}">
+                    <td th:text="${state.count}"></td>
+                    <td><img th:src="@{'http://localhost:8081/book/'+${shopper.book.path}}" alt="书籍封面"><br></td>
+                    <td th:text="${shopper.book.bookname}"></td>
+                    <td th:text="${shopper.book.author}"></td>
+                    <td th:text="${shopper.book.price}"></td>
+                    <td>
+                        <a floatfloat="left"  href="javascript:void(0)"
+                           th:onclick="sub([[${shopper.cid}]],[[${shopper.bid}]])" >-</a>
+                        <span th:text="${shopper.booknum}"></span>
+                        <a floatfloat="right" href="javascript:void(0)"
+                           th:onclick="add([[${shopper.cid}]],[[${shopper.bid}]])" >+</a>
+                    </td>
+                    <td><a href="javascript:void(0)"
+                           th:onclick="delShopper([[${shopper.cid}]],[[${shopper.bid}]])">删除</a></td>
+                </tr>
+                <tr >
+                    <td colspan="7" align="right">
+                        <a href="javascript:void(0)"
+                           th:onclick="delAll([[${session.customer.id}]])">清空购物车</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7" align="right">
+                        <span>
+                            总数量：<span th:text="${myShopper.total}"></span>
+                            <span>&nbsp</span>
+                            总价格：<span th:text="${myShopper.price}"></span>
+                            <span>&nbsp</span>
+                            <a href="javascript:void(0)"
+                               th:onclick="addOrder([[${session.customer.id}]],[[${myShopper.total}]],[[${myShopper.price}]])">提交订单</a>
+                        </span>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+
+</center>
+</body>
+<script>
+    function sub(cid,bid) {
+        $.post(
+            "../shopper/sub",
+            {"cid":cid,"bid":bid},
+            function (data) {
+                window.location.reload();
+            }
+        )
+    }
+
+    function add(cid,bid) {
+        $.post(
+            "../shopper/add",
+            {"cid":cid,"bid":bid},
+            function (data) {
+                window.location.reload();
+            }
+        )
+    }
+
+    function delShopper(cid,bid) {
+        $.post(
+            "../shopper/delShopper",
+            {"cid":cid,"bid":bid},
+            function (data) {
+                window.location.reload();
+            }
+        )
+    }
+
+    function delAll(cid,bid) {
+        $.post(
+            "../shopper/delAll",
+            {"cid":cid},
+            function (data) {
+                window.location.reload();
+            }
+        )
+    }
+
+    function addOrder(cid,total,price) {
+        $.post(
+            "../order/addOrder",
+            {"cid":cid,"total":total,"price":price},
+            function (data) {
+                if(data == "success"){
+                    alert("提交成功！")
+                    window.location.href="../customer/toList";
+                }else{
+                    alert("提交失败！")
+                }
+
+            }
+        )
+    }
+
+</script>
+</html>
